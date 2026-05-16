@@ -14,7 +14,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+
+import os
 
 import anima_config as config
 import anima_state_manager as state_mgr
@@ -79,6 +83,11 @@ class ChatResponse(BaseModel):
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
+
+@app.get("/", include_in_schema=False)
+def index():
+    return FileResponse(os.path.join(os.path.dirname(__file__), "chat.html"))
+
 
 @app.get("/health")
 def health():

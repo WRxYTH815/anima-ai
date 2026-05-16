@@ -46,13 +46,9 @@ Start the server:
 python anima_server.py
 ```
 
-Send a message:
+Open **http://localhost:8000** in your browser. That's it.
 
-```bash
-curl -X POST http://localhost:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hey, how are you feeling today?"}'
-```
+The chat UI shows the companion's current mood, streams its inner thoughts in real time as they appear, and lets you have a full conversation. No frontend build step, no separate process.
 
 ---
 

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anima</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d0d0f;
+    color: #e8e8e8;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #1e1e24;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3a3a45;
+    transition: background 0.4s;
+    flex-shrink: 0;
+  }
+  .status-dot.online  { background: #4ade80; box-shadow: 0 0 6px #4ade8077; }
+  .status-dot.typing  { background: #a78bfa; box-shadow: 0 0 6px #a78bfa77; animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  .name { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+
+  .mood-tag {
+    font-size: 11px;
+    color: #6b7280;
+    margin-left: auto;
+    font-style: italic;
+  }
+
+  #thoughts-bar {
+    font-size: 11px;
+    color: #4b4b5a;
+    padding: 6px 24px;
+    border-bottom: 1px solid #1a1a20;
+    min-height: 26px;
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.5s;
+  }
+  #thoughts-bar.fresh { color: #6366f166; }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  .bubble {
+    max-width: 72%;
+    line-height: 1.6;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    word-break: break-word;
+    white-space: pre-wrap;
+    animation: fadeUp 0.2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .bubble.user {
+    align-self: flex-end;
+    background: #1e1e2e;
+    border-bottom-right-radius: 4px;
+    color: #d4d4e8;
+  }
+
+  .bubble.anima {
+    align-self: flex-start;
+    background: #16161e;
+    border: 1px solid #1e1e2c;
+    border-bottom-left-radius: 4px;
+    color: #e2e2f0;
+  }
+
+  .bubble.anima.thinking {
+    color: #3a3a52;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 16px 24px;
+    border-top: 1px solid #1e1e24;
+    display: flex;
+    gap: 10px;
+  }
+
+  #input {
+    flex: 1;
+    background: #16161e;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    color: #e8e8e8;
+    font-size: 14px;
+    padding: 12px 16px;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    max-height: 120px;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  #input:focus { border-color: #6366f1; }
+  #input::placeholder { color: #3a3a50; }
+
+  #send {
+    background: #6366f1;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0 18px;
+    transition: background 0.2s, transform 0.1s;
+    align-self: flex-end;
+    height: 46px;
+  }
+  #send:hover   { background: #4f52d9; }
+  #send:active  { transform: scale(0.95); }
+  #send:disabled { background: #2a2a38; cursor: default; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="status-dot" id="dot"></div>
+  <span class="name" id="companion-name">Anima</span>
+  <span class="mood-tag" id="mood-label"></span>
+</header>
+
+<div id="thoughts-bar">—</div>
+
+<div id="messages"></div>
+
+<footer>
+  <textarea id="input" rows="1" placeholder="Say something…"></textarea>
+  <button id="send">↑</button>
+</footer>
+
+<script>
+  const API = '';  // same origin — server serves this file
+
+  const dot        = document.getElementById('dot');
+  const nameEl     = document.getElementById('companion-name');
+  const moodEl     = document.getElementById('mood-label');
+  const thoughtsEl = document.getElementById('thoughts-bar');
+  const messages   = document.getElementById('messages');
+  const input      = document.getElementById('input');
+  const sendBtn    = document.getElementById('send');
+
+  // ── State polling ──────────────────────────────────────────────────────────
+
+  async function pollState() {
+    try {
+      const r = await fetch(`${API}/state`);
+      if (!r.ok) return;
+      const s = await r.json();
+      const mood = s.mood || '';
+      if (mood) moodEl.textContent = mood;
+      dot.className = 'status-dot online';
+    } catch { dot.className = 'status-dot'; }
+  }
+
+  async function pollThoughts() {
+    try {
+      const r = await fetch(`${API}/thoughts`);
+      if (!r.ok) return;
+      const { thoughts } = await r.json();
+      if (thoughts && thoughts.length) {
+        const latest = thoughts[thoughts.length - 1];
+        if (latest.thought !== thoughtsEl.dataset.last) {
+          thoughtsEl.textContent = '💭 ' + latest.thought;
+          thoughtsEl.dataset.last = latest.thought;
+          thoughtsEl.classList.add('fresh');
+          setTimeout(() => thoughtsEl.classList.remove('fresh'), 3000);
+        }
+      }
+    } catch {}
+  }
+
+  setInterval(pollState,    8000);
+  setInterval(pollThoughts, 20000);
+  pollState();
+  pollThoughts();
+
+  // ── Messaging ──────────────────────────────────────────────────────────────
+
+  function addBubble(text, role) {
+    const b = document.createElement('div');
+    b.className = `bubble ${role}`;
+    b.textContent = text;
+    messages.appendChild(b);
+    messages.scrollTop = messages.scrollHeight;
+    return b;
+  }
+
+  async function send() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    input.style.height = 'auto';
+    sendBtn.disabled = true;
+    dot.className = 'status-dot typing';
+
+    addBubble(text, 'user');
+    const thinking = addBubble('…', 'anima thinking');
+
+    try {
+      const r = await fetch(`${API}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+      const { reply } = await r.json();
+      thinking.textContent = reply;
+      thinking.classList.remove('thinking');
+    } catch (e) {
+      thinking.textContent = 'Something went wrong. Is the server running?';
+    }
+
+    dot.className = 'status-dot online';
+    sendBtn.disabled = false;
+    input.focus();
+    pollState();
+  }
+
+  sendBtn.addEventListener('click', send);
+
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  });
+
+  // ── Load companion name ────────────────────────────────────────────────────
+
+  fetch(`${API}/state`).then(r => r.json()).then(s => {
+    // name comes from server config, not state — fallback to default
+  }).catch(() => {});
+</script>
+</body>
+</html>
