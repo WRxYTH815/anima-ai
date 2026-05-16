@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anima — Settings</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d0d0f;
+    color: #e8e8e8;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 16px 24px;
+    border-bottom: 1px solid #1e1e24;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  header a {
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+  header a:hover { color: #e8e8e8; }
+
+  .page-title { font-size: 15px; font-weight: 600; }
+
+  main {
+    flex: 1;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  section { display: flex; flex-direction: column; gap: 14px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #4b4b5a;
+    text-transform: uppercase;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  label {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="number"],
+  select {
+    background: #16161e;
+    border: 1px solid #2a2a38;
+    border-radius: 10px;
+    color: #e8e8e8;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  input:focus, select:focus { border-color: #6366f1; }
+  input::placeholder { color: #3a3a50; }
+
+  select option { background: #16161e; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #16161e;
+    border: 1px solid #2a2a38;
+    border-radius: 10px;
+  }
+
+  .toggle-label { font-size: 14px; color: #e8e8e8; }
+  .toggle-sub   { font-size: 11px; color: #4b4b5a; margin-top: 2px; }
+
+  .toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: #2a2a38;
+    border-radius: 22px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    left: 3px; top: 3px;
+    background: #6b7280;
+    border-radius: 50%;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle input:checked + .slider { background: #6366f133; }
+  .toggle input:checked + .slider::before { transform: translateX(18px); background: #6366f1; }
+
+  .provider-section { display: none; flex-direction: column; gap: 14px; }
+  .provider-section.active { display: flex; }
+
+  .hint { font-size: 11px; color: #4b4b5a; }
+  .hint a { color: #6366f1; text-decoration: none; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .save-bar {
+    position: sticky;
+    bottom: 0;
+    background: #0d0d0f;
+    border-top: 1px solid #1e1e24;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  #status {
+    font-size: 13px;
+    color: #4b4b5a;
+    flex: 1;
+  }
+  #status.ok  { color: #4ade80; }
+  #status.err { color: #f87171; }
+
+  button {
+    background: #6366f1;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 24px;
+    transition: background 0.2s;
+    font-family: inherit;
+  }
+  button:hover   { background: #4f52d9; }
+  button:active  { background: #3f42c0; }
+  button:disabled { background: #2a2a38; cursor: default; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/">← Back to chat</a>
+  <span class="page-title">Settings</span>
+</header>
+
+<main>
+
+  <!-- Identity -->
+  <section>
+    <div class="section-label">Identity</div>
+    <div class="row-2">
+      <div class="field">
+        <label>Companion name</label>
+        <input type="text" id="companion_name" placeholder="Anima">
+      </div>
+      <div class="field">
+        <label>Your name</label>
+        <input type="text" id="user_name" placeholder="User">
+      </div>
+    </div>
+    <div class="field">
+      <label>Personality file</label>
+      <input type="text" id="personality_file" placeholder="personality/default.txt">
+      <span class="hint">Path relative to the Anima directory. Drop a .txt file in personality/ to use it.</span>
+    </div>
+  </section>
+
+  <!-- LLM -->
+  <section>
+    <div class="section-label">Language Model</div>
+    <div class="field">
+      <label>Primary provider</label>
+      <select id="llm_provider">
+        <option value="groq">Groq</option>
+        <option value="cerebras">Cerebras</option>
+        <option value="nim">NIM (NVIDIA)</option>
+        <option value="openrouter">OpenRouter</option>
+        <option value="sambanova">SambaNova</option>
+        <option value="openai">OpenAI</option>
+        <option value="ollama">Ollama (local)</option>
+        <option value="lmstudio">LM Studio (local)</option>
+      </select>
+      <span class="hint">Anima tries this first, then cascades through all others automatically.</span>
+    </div>
+
+    <!-- Groq -->
+    <div class="provider-section" id="section-groq">
+      <div class="row-2">
+        <div class="field">
+          <label>Groq API key</label>
+          <input type="password" id="groq_api_key" placeholder="gsk_…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="groq_model" placeholder="llama-3.3-70b-versatile">
+        </div>
+      </div>
+    </div>
+
+    <!-- Cerebras -->
+    <div class="provider-section" id="section-cerebras">
+      <div class="row-2">
+        <div class="field">
+          <label>Cerebras API key</label>
+          <input type="password" id="cerebras_api_key" placeholder="csk_…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="cerebras_model" placeholder="llama3.3-70b">
+        </div>
+      </div>
+    </div>
+
+    <!-- NIM -->
+    <div class="provider-section" id="section-nim">
+      <div class="row-2">
+        <div class="field">
+          <label>NIM API key</label>
+          <input type="password" id="nim_api_key" placeholder="nvapi-…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="nim_model" placeholder="meta/llama-3.3-70b-instruct">
+        </div>
+      </div>
+    </div>
+
+    <!-- OpenRouter -->
+    <div class="provider-section" id="section-openrouter">
+      <div class="row-2">
+        <div class="field">
+          <label>OpenRouter API key</label>
+          <input type="password" id="openrouter_api_key" placeholder="sk-or-…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="openrouter_model" placeholder="meta-llama/llama-3.3-70b-instruct:free">
+        </div>
+      </div>
+    </div>
+
+    <!-- SambaNova -->
+    <div class="provider-section" id="section-sambanova">
+      <div class="row-2">
+        <div class="field">
+          <label>SambaNova API key</label>
+          <input type="password" id="sambanova_api_key" placeholder="…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="sambanova_model" placeholder="Meta-Llama-3.3-70B-Instruct">
+        </div>
+      </div>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="provider-section" id="section-openai">
+      <div class="row-2">
+        <div class="field">
+          <label>OpenAI API key</label>
+          <input type="password" id="openai_api_key" placeholder="sk-…">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="openai_model" placeholder="gpt-4o-mini">
+        </div>
+      </div>
+    </div>
+
+    <!-- Ollama -->
+    <div class="provider-section" id="section-ollama">
+      <div class="row-2">
+        <div class="field">
+          <label>Ollama URL</label>
+          <input type="text" id="ollama_url" placeholder="http://localhost:11434">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="ollama_model" placeholder="llama3">
+        </div>
+      </div>
+    </div>
+
+    <!-- LM Studio -->
+    <div class="provider-section" id="section-lmstudio">
+      <div class="row-2">
+        <div class="field">
+          <label>LM Studio URL</label>
+          <input type="text" id="lmstudio_url" placeholder="http://localhost:1234/v1">
+        </div>
+        <div class="field">
+          <label>Model</label>
+          <input type="text" id="lmstudio_model" placeholder="local-model">
+        </div>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>Max tokens</label>
+        <input type="number" id="max_tokens" min="64" max="4096" placeholder="512">
+      </div>
+      <div class="field">
+        <label>Temperature</label>
+        <input type="number" id="temperature" min="0" max="2" step="0.05" placeholder="0.85">
+      </div>
+    </div>
+  </section>
+
+  <!-- Behaviour -->
+  <section>
+    <div class="section-label">Behaviour</div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Stream of consciousness</div>
+        <div class="toggle-sub">Generate thoughts between conversations</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="stream_of_consciousness">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">Memory decay</div>
+        <div class="toggle-sub">Emotional half-life weighting on retrieval</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="memory_decay_enabled">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </section>
+
+  <!-- Server -->
+  <section>
+    <div class="section-label">Server</div>
+    <div class="row-2">
+      <div class="field">
+        <label>Host</label>
+        <input type="text" id="host" placeholder="0.0.0.0">
+      </div>
+      <div class="field">
+        <label>Port</label>
+        <input type="number" id="port" placeholder="8000">
+      </div>
+    </div>
+    <span class="hint">Changes to host/port take effect on next server restart.</span>
+  </section>
+
+</main>
+
+<div class="save-bar">
+  <span id="status"></span>
+  <button id="save-btn">Save settings</button>
+</div>
+
+<script>
+  const FIELDS_TEXT   = ['companion_name','user_name','personality_file','groq_api_key','groq_model','cerebras_api_key','cerebras_model','nim_api_key','nim_model','openrouter_api_key','openrouter_model','sambanova_api_key','sambanova_model','openai_api_key','openai_model','ollama_url','ollama_model','lmstudio_url','lmstudio_model','host'];
+  const FIELDS_NUM    = ['max_tokens','temperature','port'];
+  const FIELDS_BOOL   = ['stream_of_consciousness','memory_decay_enabled'];
+  const FIELDS_SELECT = ['llm_provider'];
+
+  const providerEl = document.getElementById('llm_provider');
+  const statusEl   = document.getElementById('status');
+  const saveBtn    = document.getElementById('save-btn');
+
+  function showProviderSection(val) {
+    document.querySelectorAll('.provider-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('section-' + val);
+    if (target) target.classList.add('active');
+  }
+
+  providerEl.addEventListener('change', () => showProviderSection(providerEl.value));
+
+  async function load() {
+    try {
+      const r = await fetch('/config');
+      const cfg = await r.json();
+
+      FIELDS_TEXT.forEach(k => {
+        const el = document.getElementById(k);
+        if (el && cfg[k] !== undefined) el.value = cfg[k];
+      });
+      FIELDS_NUM.forEach(k => {
+        const el = document.getElementById(k);
+        if (el && cfg[k] !== undefined) el.value = cfg[k];
+      });
+      FIELDS_BOOL.forEach(k => {
+        const el = document.getElementById(k);
+        if (el && cfg[k] !== undefined) el.checked = !!cfg[k];
+      });
+      FIELDS_SELECT.forEach(k => {
+        const el = document.getElementById(k);
+        if (el && cfg[k] !== undefined) el.value = cfg[k];
+      });
+
+      showProviderSection(providerEl.value);
+    } catch (e) {
+      statusEl.textContent = 'Could not load config.';
+      statusEl.className = 'err';
+    }
+  }
+
+  async function save() {
+    saveBtn.disabled = true;
+    statusEl.className = '';
+    statusEl.textContent = 'Saving…';
+
+    const data = {};
+    FIELDS_TEXT.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) data[k] = el.value;
+    });
+    FIELDS_NUM.forEach(k => {
+      const el = document.getElementById(k);
+      if (el && el.value !== '') data[k] = parseFloat(el.value);
+    });
+    FIELDS_BOOL.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) data[k] = el.checked;
+    });
+    FIELDS_SELECT.forEach(k => {
+      const el = document.getElementById(k);
+      if (el) data[k] = el.value;
+    });
+
+    try {
+      const r = await fetch('/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (r.ok) {
+        statusEl.textContent = 'Saved.';
+        statusEl.className = 'ok';
+        setTimeout(() => { statusEl.textContent = ''; statusEl.className = ''; }, 2500);
+      } else {
+        throw new Error();
+      }
+    } catch {
+      statusEl.textContent = 'Save failed.';
+      statusEl.className = 'err';
+    }
+    saveBtn.disabled = false;
+  }
+
+  saveBtn.addEventListener('click', save);
+  load();
+</script>
+</body>
+</html>

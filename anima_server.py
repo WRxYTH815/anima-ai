@@ -12,7 +12,7 @@ Endpoints:
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -89,6 +89,11 @@ def index():
     return FileResponse(os.path.join(os.path.dirname(__file__), "chat.html"))
 
 
+@app.get("/settings", include_in_schema=False)
+def settings_page():
+    return FileResponse(os.path.join(os.path.dirname(__file__), "settings.html"))
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -125,6 +130,19 @@ def get_history():
 def clear_history():
     anima_chat.clear_history()
     return {"status": "cleared"}
+
+
+@app.get("/config")
+def get_config():
+    return config.settings
+
+
+@app.post("/config")
+async def update_config(req: Request):
+    data = await req.json()
+    for k, v in data.items():
+        config.set(k, v)
+    return {"status": "saved"}
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

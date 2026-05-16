@@ -45,9 +45,24 @@
   .mood-tag {
     font-size: 11px;
     color: #6b7280;
-    margin-left: auto;
     font-style: italic;
   }
+
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .settings-link {
+    color: #3a3a50;
+    text-decoration: none;
+    font-size: 16px;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+  .settings-link:hover { color: #6b7280; }
 
   #thoughts-bar {
     font-size: 11px;
@@ -156,7 +171,10 @@
 <header>
   <div class="status-dot" id="dot"></div>
   <span class="name" id="companion-name">Anima</span>
-  <span class="mood-tag" id="mood-label"></span>
+  <div class="header-right">
+    <span class="mood-tag" id="mood-label"></span>
+    <a href="/settings" class="settings-link" title="Settings">⚙</a>
+  </div>
 </header>
 
 <div id="thoughts-bar">—</div>
