@@ -1,0 +1,25 @@
+# Core server
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+
+# HTTP (Ollama backend, optional web tools)
+requests>=2.31.0
+
+# LLM providers (install what you use)
+openai>=1.30.0          # OpenAI, Cerebras, NIM, OpenRouter, SambaNova, LM Studio
+groq>=0.9.0             # Groq
+
+# Vector memory
+chromadb>=0.5.0
+
+# Optional: local micro-model offline fallback
+# llama-cpp-python       # uncomment if using anima_micro with a local GGUF
+
+# Optional: emotion detection
+# transformers>=4.40.0
+# torch>=2.2.0
+
+# Optional: TTS
+# kokoro-onnx            # Kokoro TTS
+# TTS                    # Coqui XTTS
