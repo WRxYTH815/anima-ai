@@ -135,6 +135,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) — personality packs, memory backends, v
 
 ---
 
+## 📜 Origin & Hardware Philosophy
+
+Anima was born out of extreme hardware constraints. The first prototype in 2024 ran entirely on a legacy Dell Optiplex (Intel i7-3770) paired with a 4GB GTX 1050 Ti, driving a heavily quantized Open-Hermes 2.5 7B model. 
+
+Because it was forged in a low-VRAM environment, the codebase is fundamentally engineered to minimize overhead. The transition to the current 2026 multi-model architecture (Gemma + Qwen) ensures that while capabilities have scaled exponentially, the resource footprint remains accessible to anyone running consumer-grade hardware.
+
 ## License
 
 MIT
