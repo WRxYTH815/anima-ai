@@ -19,8 +19,8 @@ The architecture is intentionally transparent and modular so the community can p
 **Requirements:** Python 3.11+, one API key (Groq is free and fast)
 
 ```bash
-git clone https://github.com/yourname/anima
-cd anima
+git clone https://github.com/WRxYTH815/anima-ai
+cd anima-ai
 pip install -r requirements.txt
 ```
 
