@@ -72,16 +72,15 @@ anima_server.py        FastAPI — /chat, /state, /thoughts
 
 Anima tries providers in order until one responds. Configure any combination:
 
-| Provider     | Key in config          | Notes                          |
-|--------------|------------------------|--------------------------------|
-| Groq         | `groq_api_key`         | Free tier, 14k req/day         |
-| Cerebras     | `cerebras_api_key`     | Fastest, 1M tokens/day free    |
-| NIM (NVIDIA) | `nim_api_key`          | 1k req/day free                |
-| OpenRouter   | `openrouter_api_key`   | Many free models               |
-| SambaNova    | `sambanova_api_key`    | Free tier available            |
-| OpenAI       | `openai_api_key`       | gpt-4o-mini by default         |
-| Ollama       | `ollama_url`           | Local — no API key needed      |
-| LM Studio    | `lmstudio_url`         | Local — no API key needed      |
+| Provider | Key in config | Notes |
+| :--- | :--- | :--- |
+| **Groq** | `groq_api_key` | Free tier, 10k req/day |
+| **Cerebras** | `cerebras_api_key` | Fastest, 1M tokens/day free |
+| **NIM (NVIDIA)** | `nim_api_key` | 1k req/day free |
+| **OpenRouter** | `openrouter_api_key` | Many free models |
+| **SambaNova** | `sambanova_api_key` | Free tier available |
+| **Ollama** | `ollama_url` | Local — no API key needed |
+| **LM Studio** | `lmstudio_url` | Local — no API key needed |
 
 ### Memory
 
