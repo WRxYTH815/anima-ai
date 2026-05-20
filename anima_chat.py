@@ -66,6 +66,31 @@ def _build_system_prompt(user_text: str) -> str:
     if memory_ctx:
         parts.append("\n" + memory_ctx)
 
+    try:
+        import anima_wiki
+        wiki_ctx = anima_wiki.query(user_text)
+        if wiki_ctx:
+            parts.append("\n" + wiki_ctx)
+    except Exception:
+        pass
+
+    try:
+        import anima_emotion
+        emotion_ctx = anima_emotion.format_for_prompt()
+        if emotion_ctx:
+            parts.append("\n" + emotion_ctx)
+    except Exception:
+        pass
+
+    try:
+        import anima_diary
+        diary_entry = anima_diary.get_recent_entry()
+        if diary_entry:
+            name = config.get("companion_name", "Anima")
+            parts.append(f"\n[{name}'s private reflection: {diary_entry[:220]}]")
+    except Exception:
+        pass
+
     state = state_mgr.get_all()
     will   = state.get("will_to_live", 0.8)
     trust  = state.get("trust", 0.75)
@@ -294,8 +319,9 @@ def _post_exchange(user_text: str, reply: str):
     try:
         emotion = "neutral"
         try:
-            from anima_emotion import detect_emotion
-            emotion = detect_emotion(reply) or "neutral"
+            import anima_emotion
+            emotion = anima_emotion.detect_emotion(reply) or "neutral"
+            anima_emotion.feel(emotion, 0.5)
         except Exception:
             pass
 
@@ -306,6 +332,15 @@ def _post_exchange(user_text: str, reply: str):
         try:
             import anima_stream
             anima_stream.set_last_exchange(user_text, reply)
+        except Exception:
+            pass
+
+        try:
+            import anima_wiki
+            name = config.get("companion_name", "Anima")
+            anima_wiki.ingest(
+                f"User said: {user_text}\n{name} replied: {reply}"
+            )
         except Exception:
             pass
 

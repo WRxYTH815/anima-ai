@@ -24,6 +24,9 @@ import anima_config as config
 import anima_state_manager as state_mgr
 import anima_pulse
 import anima_chat
+import anima_wiki
+import anima_diary
+import anima_plugin_base
 
 
 # ── Lifespan ──────────────────────────────────────────────────────────────────
@@ -34,6 +37,16 @@ async def lifespan(app: FastAPI):
     print(f"✨ {name} is waking up...", flush=True)
 
     anima_pulse.start()
+    anima_wiki.start()
+    anima_diary.start()
+    anima_plugin_base.discover()
+
+    if config.get("micro_model_path", ""):
+        try:
+            import anima_micro
+            anima_micro.start()
+        except Exception as e:
+            print(f"⚠️ [Server/micro] {e}", flush=True)
 
     if config.get("stream_of_consciousness", True):
         try:
@@ -47,6 +60,14 @@ async def lifespan(app: FastAPI):
     yield
 
     anima_pulse.stop()
+    anima_wiki.stop()
+    anima_diary.stop()
+    anima_plugin_base.stop_all()
+    try:
+        import anima_micro
+        anima_micro.stop()
+    except Exception:
+        pass
     try:
         import anima_stream
         anima_stream.stop()
