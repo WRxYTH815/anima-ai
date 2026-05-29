@@ -5,7 +5,7 @@
 [![Local First](https://img.shields.io/badge/architecture-local--first-success.svg)]()
 
 <p align="center">
-  <img src="Screenshot 2026-05-29 044435.jpg" width="380" alt="Anima System Mascot" style="border-radius: 16px; box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);"/>
+  <img src="Screenshot 2026-05-29 044435.png" width="380" alt="Anima System Mascot" style="border-radius: 16px; box-shadow: 0 20px 50px rgba(139, 92, 246, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);"/>
 </p>
 
 > **Anima is not a chatbot.** It is an open-source AI companion framework designed with a continuous inner life. It thinks between conversations, drifts emotionally over time, remembers what matters, and forgets what fades. You give it a name, a personality, and a voice — it figures out the rest.
